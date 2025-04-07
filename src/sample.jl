@@ -1,3 +1,5 @@
+export Sample, SingleCrystal, centered_crystal
+
 abstract type Sample end
 
 struct SingleCrystal{T} <: Sample
@@ -5,7 +7,8 @@ struct SingleCrystal{T} <: Sample
     UB::Mat3{T}
 end
 
-centered_crystal(UB::AbstractMatrix) = SingleCrystal(Point3(0.0, 0.0, 0.0), Mat3{Float64}(UB))
+centered_crystal(UB::AbstractMatrix) =
+    SingleCrystal(Point3(0.0, 0.0, 0.0), Mat3{Float64}(UB))
 
 (trans::IdentityTransformation)(cryst::SingleCrystal) = cryst
 function (trans::LinearMap)(cryst::SingleCrystal)
@@ -23,6 +26,6 @@ function Base.show(io::IO, ::MIME"text/plain", cryst::SingleCrystal)
     @printf(io, "  position [μm]: %6.1f, %6.1f, %6.1f\n", (1e3 * cryst.p)...)
     println(io, "  orientation matrix (UB) [keV]:")
     for row in eachrow(cryst.UB)
-        @printf(io, "    %8.3f %8.3f %8.3f\n", (1e-3 * row)...)
+        @printf(io, "    %6.3f %6.3f %6.3f\n", (1e-3 * row)...)
     end
 end

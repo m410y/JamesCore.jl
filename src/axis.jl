@@ -1,3 +1,5 @@
+export Axis, axis, centered_axis
+
 struct Axis{T}
     v::Vec3{T}
     p::Point3{T}
@@ -32,13 +34,4 @@ function Base.show(io::IO, ::MIME"text/plain", axis::Axis)
     println(io, summary(axis), ":")
     @printf(io, "  position [μm]: %6.2f, %6.2f, %6.2f\n", (1e3 * axis.p)...)
     @printf(io, "  direction    : %6.3f, %6.3f, %6.3f", axis.v...)
-end
-
-orient_angles(axis₁::Axis, axis₂::Axis, src, dst) =
-    orient_angles(axis₁.v, axis₂.v, normalize(src), normalize(dst))
-
-function reflection_angles(axis::Axis, s, k)
-    d = 1 / norm(s)
-    λ = 1 / norm(k)
-    reflection_angles(axis.v, s * d, k * λ, asin(λ / 2d))
 end

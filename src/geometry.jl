@@ -1,3 +1,5 @@
+export orient_angles, intersect_coord
+
 angle(a::AbstractVector, b::AbstractVector) = atan(norm(cross(a, b)), dot(a, b))
 
 function axis_angle(b::AbstractVector, axis::AbstractVector, c::AbstractVector)
@@ -22,34 +24,20 @@ function circle_intersection_angles(a, b, c)
     α, β, γ
 end
 
-function orient_angles(
-    axis₁::AbstractVector,
-    axis₂::AbstractVector,
-    src::AbstractVector,
-    dst::AbstractVector,
-)
-    SA₁ = angle(src, axis₁)
-    A₁A₂ = angle(axis₁, axis₂)
-    DA₂ = angle(dst, axis₂)
+function orient_angles(axis₁::Axis, axis₂::Axis, src::AbstractVector, dst::AbstractVector)
+    SA₁ = angle(src, axis₁.v)
+    A₁A₂ = angle(axis₁, axis₂.v)
+    DA₂ = angle(dst, axis₂.v)
 
-    ∠SA₁A₂ = axis_angle(src, axis₁, axis₂)
-    ∠A₁A₂D = axis_angle(axis₁, axis₂, dst)
+    ∠SA₁A₂ = axis_angle(src, axis₁.v, axis₂.v)
+    ∠A₁A₂D = axis_angle(axis₁.v, axis₂.v, dst)
     Δα₁, Δα₂, _ = circle_intersection_angles(DA₂, SA₁, A₁A₂)
 
     (∠SA₁A₂ + Δα₁, ∠A₁A₂D + Δα₂), (∠SA₁A₂ - Δα₁, ∠A₁A₂D - Δα₂)
 end
 
-function reflection_angles(
-    axis::AbstractVector,
-    src::AbstractVector,
-    dir::AbstractVector,
-    θ::Number,
-)
-    SA = angle(src, axis)
-    AD = angle(axis, dir)
-
-    ∠SAD = axis_angle(src, axis, dir)
-    Δα, _, _ = circle_intersection_angles(pi / 2 + θ, SA, AD)
-
-    ∠SAD + Δα, ∠SAD - Δα
+function intersect_coord(detector::Detector, p::AbstractVector, v::AbstractVector)
+    _, coord... =
+        [-Vec3(v) detector.trans.linear] \ (Vec3(p...) - detector.trans.translation)
+    Vec2(coord...)
 end

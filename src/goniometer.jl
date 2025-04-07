@@ -1,11 +1,9 @@
+export Goniometer, goniometer, fix_angle
+
 struct Goniometer{N,T}
     axes::NTuple{N,Axis{T}}
     prelim::Transformation
 end
-
-const OneCircleGoniometer = Goniometer{1}
-const TwoCircleGoniometer = Goniometer{2}
-const ThreeCircleGoniometer = Goniometer{3}
 
 # TODO: optimize
 function goniometer(
@@ -45,13 +43,4 @@ function Base.show(io::IO, ::MIME"text/plain", gonio::Goniometer{N}) where {N}
         @printf(io, "    position [μm]: %6.2f, %6.2f, %6.2f\n", (1e3 * axis.p)...)
         @printf(io, "    direction    : %6.3f, %6.3f, %6.3f\n", axis.v...)
     end
-end
-
-struct Motorized{G<:Goniometer,O}
-    goniometer::G
-    object::O
-end
-
-function (motor::Motorized)(angles...)
-    motor.goniometer(angles...)(motor.object)
 end
