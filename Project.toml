@@ -1,7 +1,7 @@
 name = "JamesCore"
 uuid = "40498483-683b-490f-bdf1-fbdceae70761"
 authors = ["m410y <m410y@proton.me>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
