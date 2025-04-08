@@ -1,38 +1,30 @@
-export Axis, axis, centered_axis
+export Axis
 
 struct Axis{T}
-    v::Vec3{T}
-    p::Point3{T}
-    function Axis{T}(v, p) where {T}
+    v::Vec{3,T}
+    p::Point{3,T}
+    function Axis{T}(v::AbstractVector, p::AbstractVector) where {T}
         n = normalize(v)
         pn = p - n * dot(n, p)
         new{T}(n, pn)
     end
 end
-
-Axis(v::AbstractVector, p::AbstractVector) = Axis{Float64}(v, p)
-axis(v::AbstractVector, p::AbstractVector) = Axis(v, p)
-centered_axis(v::AbstractVector) = axis(v, zeros(3))
-centered_axis(ex::Number, ey::Number, ez::Number) = axis(Vec3(ex, ey, ez), zeros(3))
+Axis(args...) = Axis{Float64}(args...)
+Axis{T}(v::AbstractVector) where {T} = Axis{T}(v, zero(Point{3,T}))
+Axis{T}(x::Real, y::Real, z::Real) where {T} = Axis{T}(Vec{3,T}(x, y, z))
 
 function (axis::Axis)(angle)
     rot = AngleAxis(angle, axis.v..., false)
-    AffineMap(rot, axis.p - rot * axis.p)
+    trans = axis.p - rot * axis.p
+    Isometry(rot, trans)
 end
 
-(::IdentityTransformation)(axis::Axis) = axis
-function (trans::LinearMap)(axis::Axis)
-    Axis(trans(axis.v), trans(axis.p))
-end
-function (trans::Translation)(axis::Axis)
-    Axis(axis.v, trans(axis.p))
-end
-function (trans::AffineMap)(axis::Axis)
-    Axis(trans.linear * axis.v, trans(axis.p))
-end
+Base.:*(iso::Isometry, axis::Axis) = Axis(iso * axis.v, iso * axis.p)
 
 function Base.show(io::IO, ::MIME"text/plain", axis::Axis)
     println(io, summary(axis), ":")
-    @printf(io, "  position [μm]: %6.2f, %6.2f, %6.2f\n", (1e3 * axis.p)...)
-    @printf(io, "  direction    : %6.3f, %6.3f, %6.3f", axis.v...)
+    @printf(io, "  direction: % 8f, % 8f, % 8f", axis.v...)
+    if !iszero(axis.p)
+        @printf(io, "\n  position : % 8f, % 8f, % 8f", axis.p...)
+    end
 end

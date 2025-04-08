@@ -1,40 +1,24 @@
-export Detector, detector
+export Detector
 
-struct Detector
-    size::NTuple{2,Integer}
-    trans::Transformation
+struct Detector{T}
+    M::SMatrix{3,2,T,6}
+    p::Point{3,T}
+    function Detector{T}(M::AbstractMatrix, p::AbstractVector) where {T}
+        new{T}(SMatrix{3,2,T,6}(M), Point{3,T}(p))
+    end
 end
+Detector(args...) = Detector{Float64}(args...)
+Detector{T}(ex::AbstractVector, ey::AbstractVector, p::AbstractVector) where {T} = Detector{T}([ex ey], p)
 
-function detector(
-    size::NTuple{2,Integer},
-    p0::AbstractVector,
-    ex::AbstractVector,
-    ey::AbstractVector,
-)
-    amap = AffineMap(SMatrix{3,2,Float64,6}([ex ey]), Vec3{Float64}(p0))
-    Detector(size, amap)
-end
+(detector::Detector)(xy::AbstractVector) = detector.M * xy + detector.p
+(detector::Detector)(x::Real, y::Real) = detector(Vec2(x, y))
 
-(::IdentityTransformation)(detector::Detector) = detector
-function (trans::LinearMap)(detector::Detector)
-    Detector(detector.size, trans ∘ detector.trans)
-end
-function (trans::Translation)(detector::Detector)
-    Detector(detector.size, trans ∘ detector.trans)
-end
-function (trans::AffineMap)(detector::Detector)
-    Detector(detector.size, trans ∘ detector.trans)
-end
-
-(detector::Detector)(x::Number, y::Number) = detector.trans(Vec2(x, y))
-(detector::Detector)(coord::AbstractVector) = detector.trans(coord)
+Base.:*(iso::Isometry, detector::Detector) = Detector(iso * detector.M, iso * detector.p)
 
 function Base.show(io::IO, ::MIME"text/plain", detector::Detector)
-    p = detector.trans.translation
-    ex, ey = eachcol(detector.trans.linear)
+    ex, ey = eachcol(detector.M)
     println(io, summary(detector), ":")
-    println(io, "  size: ", join(detector.size, "×"))
-    @printf(io, "  zero position [mm]: %6.1f, %6.1f, %6.1f\n", p...)
-    @printf(io, "  x line [μm]: %6.1f, %6.1f, %6.1f\n", (1e3 * ex)...)
-    @printf(io, "  y line [μm]: %6.1f, %6.1f, %6.1f", (1e3 * ey)...)
+    @printf(io, "  zero  : % 8f, % 8f, % 8f\n", detector.p...)
+    @printf(io, "  x line: % 8f, % 8f, % 8f\n", ex...)
+    @printf(io, "  y line: % 8f, % 8f, % 8f", ey...)
 end

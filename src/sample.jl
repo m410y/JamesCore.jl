@@ -1,31 +1,25 @@
-export Sample, SingleCrystal, centered_crystal
+export SingleCrystal
 
-abstract type Sample end
-
-struct SingleCrystal{T} <: Sample
-    p::Point3{T}
+struct SingleCrystal{T}
     UB::Mat3{T}
+    p::Point{3,T}
+    function SingleCrystal{T}(UB::AbstractMatrix, p::AbstractVector) where {T}
+        new{T}(Mat3{T}(UB), Point{3,T}(p))
+    end
 end
+SingleCrystal(args...) = SingleCrystal{Float64}(args...)
+SingleCrystal{T}(UB::AbstractMatrix) where {T} = SingleCrystal{T}(UB, zero(Point{3,T}))
 
-centered_crystal(UB::AbstractMatrix) =
-    SingleCrystal(Point3(0.0, 0.0, 0.0), Mat3{Float64}(UB))
-
-(trans::IdentityTransformation)(cryst::SingleCrystal) = cryst
-function (trans::LinearMap)(cryst::SingleCrystal)
-    SingleCrystal(trans(cryst.p), trans(cryst.UB))
-end
-function (trans::Translation)(cryst::SingleCrystal)
-    SingleCrystal(trans(cryst.p), cryst.UB)
-end
-function (trans::AffineMap)(cryst::SingleCrystal)
-    SingleCrystal(trans(cryst.p), trans.linear * cryst.UB)
-end
+Base.:*(iso::Isometry, cryst::SingleCrystal) = SingleCrystal(iso * cryst.UB, iso * cryst.p)
 
 function Base.show(io::IO, ::MIME"text/plain", cryst::SingleCrystal)
+    row1, row2, row3 = eachrow(cryst.UB)
     println(io, summary(cryst), ":")
-    @printf(io, "  position [μm]: %6.1f, %6.1f, %6.1f\n", (1e3 * cryst.p)...)
-    println(io, "  orientation matrix (UB) [keV]:")
-    for row in eachrow(cryst.UB)
-        @printf(io, "    %6.3f %6.3f %6.3f\n", (1e-3 * row)...)
+    println(io, "  orientation matrix (UB):")
+    @printf(io, "    % 8f % 8f % 8f\n", row1...)
+    @printf(io, "    % 8f % 8f % 8f\n", row2...)
+    @printf(io, "    % 8f % 8f % 8f", row3...)
+    if !iszero(cryst.p)
+        @printf(io, "\n  position: % 8f, % 8f, % 8f\n", cryst.p...)
     end
 end

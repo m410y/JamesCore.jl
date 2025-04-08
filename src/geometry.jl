@@ -2,7 +2,7 @@ export orient_angles, intersect_coord
 
 angle(a::AbstractVector, b::AbstractVector) = atan(norm(cross(a, b)), dot(a, b))
 
-function axis_angle(b::AbstractVector, axis::AbstractVector, c::AbstractVector)
+function axis_angle(axis::Axis, b::AbstractVector, c::AbstractVector)
     b_a = b - axis * dot(axis, b)
     c_a = c - axis * dot(axis, c)
     atan(dot(axis, cross(b_a, c_a)), dot(b_a, c_a))
@@ -29,15 +29,15 @@ function orient_angles(axis₁::Axis, axis₂::Axis, src::AbstractVector, dst::A
     A₁A₂ = angle(axis₁, axis₂.v)
     DA₂ = angle(dst, axis₂.v)
 
-    ∠SA₁A₂ = axis_angle(src, axis₁.v, axis₂.v)
-    ∠A₁A₂D = axis_angle(axis₁.v, axis₂.v, dst)
+    ∠SA₁A₂ = axis_angle(axis₁, src, axis₂.v)
+    ∠A₁A₂D = axis_angle(axis₂, axis₁.v, dst)
     Δα₁, Δα₂, _ = circle_intersection_angles(DA₂, SA₁, A₁A₂)
 
     (∠SA₁A₂ + Δα₁, ∠A₁A₂D + Δα₂), (∠SA₁A₂ - Δα₁, ∠A₁A₂D - Δα₂)
 end
 
-function intersect_coord(detector::Detector, p::AbstractVector, v::AbstractVector)
+function intersect_coord(detector::Detector, xray::Xray)
     _, coord... =
-        [-Vec3(v) detector.trans.linear] \ (Vec3(p...) - detector.trans.translation)
+        [-xray.k detector.trans.linear] \ (xray.p - detector.p)
     Vec2(coord...)
 end

@@ -8,10 +8,9 @@ using StaticArrays
 using OffsetArrays
 using GeometryBasics
 using Rotations
-using CoordinateTransformations
 
+include("isometry.jl")
 include("axis.jl")
-include("goniometer.jl")
 include("detector.jl")
 include("sample.jl")
 include("xray.jl")

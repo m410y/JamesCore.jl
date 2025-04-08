@@ -7,7 +7,7 @@ function reflection_angles(axis::Axis, s::AbstractVector, k::AbstractVector)
     SA = angle(s, axis.v)
     AD = angle(axis.v, k)
 
-    ∠SAD = axis_angle(s, axis.v, k)
+    ∠SAD = axis_angle(axis, s, k)
     Δα, _, _ = circle_intersection_angles((pi + bragg_angle(s, k)) / 2, SA, AD)
 
     ∠SAD + Δα, ∠SAD - Δα
