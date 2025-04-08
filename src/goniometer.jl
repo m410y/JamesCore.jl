@@ -1,7 +1,7 @@
 export Goniometer, goniometer, fix_angle
 
-struct Goniometer{N,T}
-    axes::NTuple{N,Axis{T}}
+struct Goniometer{N}
+    axes::NTuple{N,Axis}
     prelim::Transformation
 end
 

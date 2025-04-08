@@ -13,6 +13,7 @@ end
 Axis(v::AbstractVector, p::AbstractVector) = Axis{Float64}(v, p)
 axis(v::AbstractVector, p::AbstractVector) = Axis(v, p)
 centered_axis(v::AbstractVector) = axis(v, zeros(3))
+centered_axis(ex::Number, ey::Number, ez::Number) = axis(Vec3(ex, ey, ez), zeros(3))
 
 function (axis::Axis)(angle)
     rot = AngleAxis(angle, axis.v..., false)

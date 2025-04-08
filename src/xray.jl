@@ -18,6 +18,7 @@ end
 
 unpolarized_xray(p::AbstractVector, k::AbstractVector) = XRay{Float64}(p, k)
 centered_unpolarized_xray(k::AbstractVector) = unpolarized_xray(zeros(3), k)
+centered_unpolarized_xray(kx::Number, ky::Number, kz::Number) = unpolarized_xray(zeros(3), Vec3(kx, ky, kz))
 
 function Base.show(io::IO, ::MIME"text/plain", xray::XRay)
     println(io, summary(xray), ":")

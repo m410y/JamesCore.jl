@@ -1,8 +1,8 @@
 export Detector, detector
 
-struct Detector{T}
+struct Detector
     size::NTuple{2,Integer}
-    trans::AffineMap{SMatrix{3,2,T,6},Vec3{T}}
+    trans::Transformation
 end
 
 function detector(
@@ -12,7 +12,7 @@ function detector(
     ey::AbstractVector,
 )
     amap = AffineMap(SMatrix{3,2,Float64,6}([ex ey]), Vec3{Float64}(p0))
-    Detector{Float64}(size, amap)
+    Detector(size, amap)
 end
 
 (::IdentityTransformation)(detector::Detector) = detector
