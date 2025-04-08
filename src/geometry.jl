@@ -36,7 +36,7 @@ function orient_angles(axis₁::Axis, axis₂::Axis, src::AbstractVector, dst::A
     (∠SA₁A₂ + Δα₁, ∠A₁A₂D + Δα₂), (∠SA₁A₂ - Δα₁, ∠A₁A₂D - Δα₂)
 end
 
-function intersect_coord(detector::Detector, xray::Xray)
+function intersect_coord(detector::Detector, xray::XRay)
     _, coord... =
         [-xray.k detector.trans.linear] \ (xray.p - detector.p)
     Vec2(coord...)

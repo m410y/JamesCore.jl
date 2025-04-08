@@ -1,11 +1,9 @@
 module JamesCore
 
 using LinearAlgebra
-using Statistics
 using Printf
 
 using StaticArrays
-using OffsetArrays
 using GeometryBasics
 using Rotations
 
