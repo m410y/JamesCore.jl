@@ -8,7 +8,7 @@ function axis_angle(axis::Axis, b::AbstractVector, c::AbstractVector)
     atan(dot(axis.v, cross(b_a, c_a)), dot(b_a, c_a))
 end
 
-function circle_intersection_angles(a, b, c)
+function circle_intersection_angles(a::Real, b::Real, c::Real)
     s = (a + b + c) / 2
     @assert s > max(a, b, c) "Impossible spherical triangle"
 
@@ -37,7 +37,6 @@ function orient_angles(axis₁::Axis, axis₂::Axis, src::AbstractVector, dst::A
 end
 
 function intersect_coord(detector::Detector, xray::XRay)
-    _, coord... =
-        [-xray.k detector.M] \ (xray.p - detector.p)
-    Vec2(coord...)
+    _, x, y = [xray.k detector.M] \ (xray.p - detector.p)
+    Vec2(x, y)
 end
