@@ -16,12 +16,14 @@ abstract type RigidObject end
     )...,
 )
 
+abstract type Axis <: RigidObject end
+
 """
     RotAxis{T<:Real}
 
 Affine rotation axis. Uses function-like argument to generate affine transformation.
 """
-struct RotAxis{T<:Real} <: RigidObject
+struct RotAxis{T<:Real} <: Axis
     v::Vec3{T}
     p::Point3{T}
     RotAxis{T}(v::AbstractVector, p::AbstractVector) where {T} =
@@ -38,7 +40,7 @@ end
 
 Affine translation axis. Uses function-like argument to generate translation transformation.
 """
-struct TransAxis{T<:Real} <: RigidObject
+struct TransAxis{T<:Real} <: Axis
     v::Vec3{T}
     TransAxis{T}(v::AbstractVector) where {T} =
         new{T}(Vec3{T}(normalize(v)))
@@ -58,3 +60,23 @@ function Base.angle(a::AbstractVector, b::AbstractVector)
     atan(norm(cross(a, b)), dot(a, b))
 end
 
+
+"""
+    fix_angles(axes, fixed)
+
+Takes indexible `Axis` collection and collection of `index => parameter` pairs.
+Returns `Vector` of resulting axes and residual `Transformation`.
+"""
+function fix_axes_params(axes, fixed) 
+    fixed = Dict(fixed)
+    new_axes = Axis[]
+    trans = IdentityTransformation()
+    for (i, axis) in reverse(enumerate(axes))
+        if haskey(fixed, i)
+            trans = trans ∘ axis(fixed[i])
+        else
+            push!(new_axes, trans(axis))
+        end
+    end
+    new_axes, trans
+end

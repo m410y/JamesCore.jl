@@ -9,7 +9,10 @@ using GeometryBasics
 using Rotations
 using CoordinateTransformations
 
+export RotAxis, TransAxis, fix_axes_params
+export Beam, UnknownSample, Crystal, Detector
 export xy2q, xy2q_jac, k2xy
+export solve_reflection, solve_orientation
 export MillerIterator
 
 include("geometry.jl")
