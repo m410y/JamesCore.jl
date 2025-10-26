@@ -1,9 +1,23 @@
 name = "JamesCore"
 uuid = "979fc264-f091-4d46-bc40-ce8d18beab5d"
-authors = ["m410y <m410y@proton.me> and contributors"]
 version = "1.0.0-DEV"
+authors = ["m410y <m410y@proton.me> and contributors"]
+
+[deps]
+CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
+GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
+CoordinateTransformations = "0.6"
+GeometryBasics = "0.5"
+LinearAlgebra = "1"
+Rotations = "1"
+StaticArrays = "1"
+Statistics = "1"
 julia = "1.6.7"
 
 [extras]
