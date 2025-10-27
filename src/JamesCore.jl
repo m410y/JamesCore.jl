@@ -11,8 +11,8 @@ using Rotations
 using CoordinateTransformations
 
 export RotAxis, TransAxis, fix_axes_params
-export Beam, UnknownSample, Crystal, Detector
-export xy2q, xy2q_jac, k2xy
+export Ray, Detector
+export ray2xy, xy2q, xy2q_jac
 export solve_reflection, solve_orientation, solve_equator_reflection
 export MillerIterator
 

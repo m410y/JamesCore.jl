@@ -1,3 +1,8 @@
+"""
+    MillerIterator{N,T<:Integer,K<:Real}
+
+Simple iterator over all interger points (aka miller indices) `v` with `dot(v, Q, v) ≤ rr`.
+"""
 struct MillerIterator{N,T<:Integer,K<:Real}
     Q::Mat{N,N,K}
     rr::K
