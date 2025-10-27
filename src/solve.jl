@@ -24,31 +24,48 @@ function solve_rot_eq(
 end
 
 """
-    solve_reflection(k::AbstractVector, q::AbstractVector, axis::AbstractVector)
+    solve_reflection(q::AbstractVector, axis::AbstractVector, k::AbstractVector)
 
 Solves equation `norm(AngleAxis(x, a...) * q + k) == norm(k)`.
 """
 function solve_reflection(
-    a::AbstractVector,
     q::AbstractVector,
+    a::AbstractVector,
     k::AbstractVector;
 )
     solve_rot_eq(a, q, k, -dot(q, q) / 2)
 end
 
 """
-    solve_orientation(from::AbstractVector, to::AbstractVector, axis₁::AbstractVector, axis₂::AbstractVector)
+    solve_orientation(from::AbstractVector, axis₁::AbstractVector, axis₂::AbstractVector, to::AbstractVector, )
 
-Solves equation `AngleAxis(x₂, axis₂...) * AngleAxis(x₁, axis₁...) * from = to`.
+Solves equation `AngleAxis(x₂, axis₂...) * AngleAxis(x₁, axis₁...) * from == to`.
 """
 function solve_orientation(
+    from::AbstractVector,
     axis₁::AbstractVector,
     axis₂::AbstractVector,
-    from::AbstractVector,
     to::AbstractVector,
 )
     k = norm(from) / norm(to)
     α1, α2 = solve_rot_eq(axis₁, from, axis₂, dot(to, axis₂) * k)
     β1, β2 = solve_rot_eq(-axis₂, to, axis₁, dot(from, axis₁) / k)
     (α1, β1), (α2, β2)
+end
+
+"""
+    solve_equator_reflection(q::AbstractVector, axis₁::AbstractVector, axis₂::AbstractVector, q::AbstractVector)
+
+Solves equations `norm(k + AngleAxis(x₂, axis₂...) * AngleAxis(x₁, axis₁...) * q) == norm(k)` and `dot(q, axis₂) == 0`.
+"""
+function solve_equator_reflection(
+    q::AbstractVector,
+    axis₁::AbstractVector,
+    axis₂::AbstractVector,
+    k::AbstractVector,
+)
+    α1, α2 = solve_rot_eq(axis₁, q, axis₂, 0)
+    βs1 = solve_reflection(AngleAxis(α1, axis₁...) * q, axis₂, k)
+    βs2 = solve_reflection(AngleAxis(α2, axis₁...) * q, axis₂, k)
+    (α1, βs1), (α2, βs2)
 end

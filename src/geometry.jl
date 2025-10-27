@@ -19,6 +19,22 @@ abstract type RigidObject end
 abstract type Axis <: RigidObject end
 
 """
+    str_to_dir(s::AbstractString)
+
+Convert usual direction notation to vector.
+"""
+function str2dir(s::AbstractString)
+    s == "x" ? Vec(1, 0 ,0) :
+    s == "y" ? Vec(0, 1 ,0) :
+    s == "z" ? Vec(0, 0 ,1) :
+    s == "-x" ? Vec(-1, 0 ,0) :
+    s == "-y" ? Vec(0, -1 ,0) :
+    s == "-z" ? Vec(0, 0 ,-1) : error("String not supported")
+end
+Vec3{T}(str::AbstractString) where {T} = Vec3{T}(str2dir(str))
+Vec3(str::AbstractString) = Vec3(str2dir(str))
+
+"""
     RotAxis{T<:Real}
 
 Affine rotation axis. Uses function-like argument to generate affine transformation.
@@ -26,12 +42,14 @@ Affine rotation axis. Uses function-like argument to generate affine transformat
 struct RotAxis{T<:Real} <: Axis
     v::Vec3{T}
     p::Point3{T}
-    RotAxis{T}(v::AbstractVector, p::AbstractVector) where {T} =
+    RotAxis{T}(v::AbstractVector, p::AbstractVector = zero(Point3{T})) where {T} =
         new{T}(Vec3{T}(normalize(v)), Point3{T}(p))
 end
+RotAxis(args...) = RotAxis{Float64}(args...)
+RotAxis{T}(str::AbstractString) where {T<:Real} = RotAxis{T}(str2dir(str))
 
 # axis rotation generation
-function (axis::RotAxis{T})(angle::Real) where {T}
+function (axis::RotAxis{T})(angle::Number) where {T}
     recenter(AngleAxis{T}(angle, axis.v..., false), axis.p)
 end
 
@@ -45,9 +63,11 @@ struct TransAxis{T<:Real} <: Axis
     TransAxis{T}(v::AbstractVector) where {T} =
         new{T}(Vec3{T}(normalize(v)))
 end
+TransAxis(args...) = TransAxis{Float64}(args...)
+TransAxis{T}(str::AbstractString) where {T<:Real} = TransAxis{T}(str2dir(str))
 
 # axis translation generation
-function (axis::TransAxis{T})(distance::Real) where {T}
+function (axis::TransAxis{T})(distance::Number) where {T}
     Translation(axis.v * distance)
 end
 
@@ -71,11 +91,11 @@ function fix_axes_params(axes, fixed)
     fixed = Dict(fixed)
     new_axes = Axis[]
     trans = IdentityTransformation()
-    for (i, axis) in reverse(enumerate(axes))
+    for i in reverse(eachindex(axes))
         if haskey(fixed, i)
-            trans = trans ∘ axis(fixed[i])
+            trans = trans ∘ axes[i](fixed[i])
         else
-            push!(new_axes, trans(axis))
+            push!(new_axes, trans(axes[i]))
         end
     end
     new_axes, trans

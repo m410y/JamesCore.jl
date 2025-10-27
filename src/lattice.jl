@@ -29,7 +29,7 @@ function Base.iterate(iter::MillerIterator{N,T}) where {N,T}
     while next != nothing
         (item, state) = next
         v = Vec{N,T}(Tuple(item))
-        if dot(v, iter.Q, v) ≤ iter.rr
+        if !iszero(v) && dot(v, iter.Q, v) ≤ iter.rr
             return v, state
         end
         next = iterate(iter, state)
@@ -42,7 +42,7 @@ function Base.iterate(iter::MillerIterator{N,T}, state) where {N,T}
     while next != nothing
         (item, state) = next
         v = Vec{N,T}(Tuple(item))
-        if dot(v, iter.Q, v) ≤ iter.rr
+        if !iszero(v) && dot(v, iter.Q, v) ≤ iter.rr
             return v, state
         end
         next = iterate(iter.hkls, state)
