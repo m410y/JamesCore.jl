@@ -5,20 +5,23 @@ using LinearAlgebra
 using Statistics
 
 using StaticArrays
-using GeometryBasics
 import GeometryBasics: Vec3
+using GeometryBasics
 using Rotations
 using CoordinateTransformations
 
-export RotAxis, TransAxis, fix_axes_params
-export Ray, Detector
+export RigidObject
+export RotAxis, TransAxis, fix_axes
+export Ray, Plane, Lattice
 export ray2xy, xy2q, xy2q_jac
-export solve_reflection, solve_orientation, solve_equator_reflection
+export solve_rot, solve_orientation, solve_equator_reflection
 export MillerIterator
 
+include("utils.jl")
 include("geometry.jl")
+include("types.jl")
 include("model.jl")
 include("solve.jl")
-include("lattice.jl")
+include("miller.jl")
 
 end

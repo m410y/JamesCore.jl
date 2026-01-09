@@ -13,9 +13,10 @@ struct MillerIterator{N,T<:Integer,K<:Real}
             throw(ArgumentError("Matrix must be positive definite"))
         end
         q_min = minimum(svdvals(Q))
-        idx_max = T(floor(abs(r) / q_min))
+        rr = abs2(r)
+        idx_max = T(floor(sqrt(rr / q_min)))
         hkls = CartesianIndices(Tuple(-idx_max:idx_max for _ in 1:N))
-        new{N,T,K}(Mat{N,N,K}(Q), r^2, hkls)
+        new{N,T,K}(Mat{N,N,K}(Q), rr, hkls)
     end
 end
 
